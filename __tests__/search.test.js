@@ -13,6 +13,14 @@ describe('Search', () => {
     expect(result).toEqual([doc2.id, doc1.id]);
   });
 
+  test('Fuzzy list', () => {
+    let result = search(docs, 'your thing');
+    expect(result).toEqual([doc2.id, doc3.id]);
+
+    result = search(docs, 'your thing shooter');
+    expect(result).toEqual([doc3.id, doc2.id]);
+  });
+
   test('Find even thought word has punctuation marks', () => {
     let result = search(docs, 'pint');
 

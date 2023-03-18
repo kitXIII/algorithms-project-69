@@ -3,30 +3,25 @@ import _ from 'lodash';
 import stringToTerms from './stringToTerms.js';
 
 const search = (docs, sample) => {
-  const sampleTerm = stringToTerms(sample)[0];
+  const sampleTerms = new Set(stringToTerms(sample));
 
-  if (_.isEmpty(sampleTerm)) {
+  if (!sampleTerms.size) {
     return [];
   }
 
-  let maxRelevance = 0;
+  const results = _.chain(docs)
+    .map((doc) => {
+      const terms = stringToTerms(doc.text);
+      const relevance = _.sumBy(terms, (t) => sampleTerms.has(t));
 
-  return docs.reduce((acc, doc) => {
-    const terms = stringToTerms(doc.text);
-    const relevance = _.sumBy(terms, (t) => t === sampleTerm);
+      return { ...doc, relevance };
+    })
+    .filter(({ relevance }) => relevance > 0)
+    .value();
 
-    if (!relevance) {
-      return acc;
-    }
-
-    if (relevance > maxRelevance) {
-      maxRelevance = relevance;
-
-      return [doc.id, ...acc];
-    }
-
-    return [...acc, doc.id];
-  }, []);
+  return results
+    .sort((a, b) => b.relevance - a.relevance)
+    .map(({ id }) => id);
 };
 
 export default search;
