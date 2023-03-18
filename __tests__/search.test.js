@@ -10,20 +10,17 @@ describe('Search', () => {
   test('Find by word', () => {
     const result = search(docs, 'shoot');
 
-    expect(result).toHaveLength(2);
-    expect(result).toEqual(expect.arrayContaining([doc1.id, doc2.id]));
+    expect(result).toEqual([doc2.id, doc1.id]);
   });
 
   test('Find even thought word has punctuation marks', () => {
     let result = search(docs, 'pint');
 
-    expect(result).toHaveLength(1);
-    expect(result).toEqual(expect.arrayContaining([doc1.id]));
+    expect(result).toEqual([doc1.id]);
 
     result = search(docs, 'pint?');
 
-    expect(result).toHaveLength(1);
-    expect(result).toEqual(expect.arrayContaining([doc1.id]));
+    expect(result).toEqual([doc1.id]);
   });
 
   test('Returns empty array if sample contains punctuation marks only', () => {

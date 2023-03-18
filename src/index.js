@@ -3,20 +3,29 @@ import _ from 'lodash';
 import stringToTerms from './stringToTerms.js';
 
 const search = (docs, sample) => {
-  const term = stringToTerms(sample)[0];
+  const sampleTerm = stringToTerms(sample)[0];
 
-  if (_.isEmpty(term)) {
+  if (_.isEmpty(sampleTerm)) {
     return [];
   }
 
-  return docs.reduce((acc, doc) => {
-    const words = stringToTerms(doc.text);
+  let maxRelevance = 0;
 
-    if (words.some((w) => w === term)) {
-      return [...acc, doc.id];
+  return docs.reduce((acc, doc) => {
+    const terms = stringToTerms(doc.text);
+    const relevance = _.sumBy(terms, (t) => t === sampleTerm);
+
+    if (!relevance) {
+      return acc;
     }
 
-    return acc;
+    if (relevance > maxRelevance) {
+      maxRelevance = relevance;
+
+      return [doc.id, ...acc];
+    }
+
+    return [...acc, doc.id];
   }, []);
 };
 
