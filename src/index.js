@@ -1,11 +1,23 @@
-const search = (docs, sample) => docs.reduce((acc, doc) => {
-  const words = doc.text.split(' ');
+import _ from 'lodash';
 
-  if (words.some((w) => w === sample)) {
-    return [...acc, doc.id];
+import stringToTerms from './stringToTerms.js';
+
+const search = (docs, sample) => {
+  const term = stringToTerms(sample)[0];
+
+  if (_.isEmpty(term)) {
+    return [];
   }
 
-  return acc;
-}, []);
+  return docs.reduce((acc, doc) => {
+    const words = stringToTerms(doc.text);
+
+    if (words.some((w) => w === term)) {
+      return [...acc, doc.id];
+    }
+
+    return acc;
+  }, []);
+};
 
 export default search;
