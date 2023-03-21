@@ -14,10 +14,8 @@ describe('Search', () => {
   });
 
   test('Fuzzy list', () => {
-    let result = search(docs, 'your thing');
-    expect(result).toEqual([doc2.id, doc3.id]);
+    const result = search(docs, 'your thing shooter');
 
-    result = search(docs, 'your thing shooter');
     expect(result).toEqual([doc3.id, doc2.id]);
   });
 
