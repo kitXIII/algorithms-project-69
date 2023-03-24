@@ -8,9 +8,9 @@ describe('getReverseIndex', () => {
   const docs = [doc1, doc2];
 
   const index = {
-    some: [{ id: 'doc1', relevance: 1 }, { id: 'doc2', relevance: 1 }],
-    text: [{ id: 'doc1', relevance: 1 }, { id: 'doc2', relevance: 2 }],
-    too: [{ id: 'doc2', relevance: 1 }],
+    some: [{ id: 'doc1', frequency: 0.5 }, { id: 'doc2', frequency: 0.25 }],
+    text: [{ id: 'doc1', frequency: 0.5 }, { id: 'doc2', frequency: 0.5 }],
+    too: [{ id: 'doc2', frequency: 0.25 }],
   };
 
   test('Get correct reverse index from data', () => {

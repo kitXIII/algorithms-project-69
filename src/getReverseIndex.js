@@ -3,12 +3,17 @@ import _ from 'lodash';
 import stringToTerms from './stringToTerms.js';
 
 const getReverseIndex = (docs) => docs.reduce((acc, doc) => {
-  const termsRelevance = _.countBy(stringToTerms(doc.text));
+  const terms = stringToTerms(doc.text);
+  const termsRelevance = _.countBy(terms);
 
-  const partialAcc = Object.keys(termsRelevance)
+  const uniqTerms = Object.keys(termsRelevance);
+
+  const partialAcc = uniqTerms
     .reduce((oneDocAcc, term) => ({
       ...oneDocAcc,
-      [term]: [...(acc[term] || []), { id: doc.id, relevance: termsRelevance[term] }],
+      [term]: [
+        ...(acc[term] || []), { id: doc.id, frequency: termsRelevance[term] / terms.length },
+      ],
     }), {});
 
   return {
