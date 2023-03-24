@@ -1,31 +1,40 @@
 import _ from 'lodash';
 import stringToTerms from './stringToTerms.js';
 import getReverseIndex from './getReverseIndex.js';
+import getTermFrequency from './getTermFrequency.js';
 
-const search = (docs, sample) => {
+const search = (documents, sample) => {
   const sampleTerms = _.uniq(stringToTerms(sample));
 
   if (!sampleTerms.length) {
     return [];
   }
 
-  const index = getReverseIndex(docs);
+  const index = getReverseIndex(documents);
 
-  /**
-   * results = {
-   *  [docId]: sumOfRelevances,
-   *  ...
-   * }
-   */
   const results = sampleTerms
-    .map((term) => index[term])
+    .map((term) => {
+      const docs = index[term];
+
+      if (_.isEmpty(docs)) {
+        return null;
+      }
+
+      const idf = Math.log(documents.length / docs.length);
+
+      return docs.map((doc) => {
+        const tf = getTermFrequency(doc.terms, term);
+
+        return { ...doc, criteria: tf * idf };
+      });
+    })
     .filter((v) => v)
     .flat()
     .reduce((acc, item) => {
-      const relevance = (acc[item] || 0) + item.relevance;
+      const criteria = (acc[item.id] || 0) + item.criteria;
       return {
         ...acc,
-        [item.id]: relevance,
+        [item.id]: criteria,
       };
     }, {});
 
