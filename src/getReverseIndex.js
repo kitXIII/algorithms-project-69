@@ -1,22 +1,36 @@
 import _ from 'lodash';
 
+import roundByDecimal from './roundByDecimal.js';
 import stringToTerms from './stringToTerms.js';
 
-const getReverseIndex = (docs) => docs.reduce((acc, doc) => {
-  const terms = stringToTerms(doc.text);
+const getReverseIndex = (documents) => {
+  const indexWithFrequencies = documents.reduce((acc, doc) => {
+    const terms = stringToTerms(doc.text);
 
-  const partialAcc = _.uniq(terms)
-    .reduce((localAcc, term) => ({
-      ...localAcc,
-      [term]: [
-        ...(acc[term] || []), { id: doc.id, terms },
-      ],
-    }), {});
+    const termsFrequencies = _.chain(terms)
+      .countBy()
+      .mapValues((count) => count / terms.length)
+      .value();
 
-  return {
-    ...acc,
-    ...partialAcc,
-  };
-}, {});
+    const partialAcc = Object.keys(termsFrequencies)
+      .reduce((localAcc, term) => ({
+        ...localAcc,
+        [term]: [
+          ...(acc[term] || []), { id: doc.id, frequency: termsFrequencies[term] },
+        ],
+      }), {});
+
+    return {
+      ...acc,
+      ...partialAcc,
+    };
+  }, {});
+
+  return _.mapValues(indexWithFrequencies, (docs) => {
+    const idf = Math.log(documents.length / docs.length);
+
+    return docs.map((doc) => ({ ...doc, criteria: roundByDecimal(idf * doc.frequency, 3) }));
+  });
+};
 
 export default getReverseIndex;

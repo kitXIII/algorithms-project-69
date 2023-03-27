@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import stringToTerms from './stringToTerms.js';
 import getReverseIndex from './getReverseIndex.js';
-import getTermFrequency from './getTermFrequency.js';
 
 const search = (documents, sample) => {
   const sampleTerms = _.uniq(stringToTerms(sample));
@@ -13,21 +12,7 @@ const search = (documents, sample) => {
   const index = getReverseIndex(documents);
 
   const results = sampleTerms
-    .map((term) => {
-      const docs = index[term];
-
-      if (_.isEmpty(docs)) {
-        return null;
-      }
-
-      const idf = Math.log(documents.length / docs.length);
-
-      return docs.map((doc) => {
-        const tf = getTermFrequency(doc.terms, term);
-
-        return { ...doc, criteria: tf * idf };
-      });
-    })
+    .map((sampleTerm) => index[sampleTerm])
     .filter((v) => v)
     .flat()
     .reduce((acc, item) => {
