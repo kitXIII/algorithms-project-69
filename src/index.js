@@ -16,18 +16,17 @@ const search = (documents, sample) => {
     .filter((v) => v)
     .flatten()
     .reduce((acc, item) => {
-      const { weight, count } = acc[item.id] || { weight: 0, count: 0 };
+      const { weight } = acc[item.id] || { weight: 0 };
       return {
         ...acc,
         [item.id]: {
           id: item.id,
-          weight: item.weight > weight ? item.weight : weight,
-          count: count + 1,
+          weight: item.weight + weight,
         },
       };
     }, {})
     .values()
-    .sortBy(['count', 'weight'])
+    .sortBy('weight')
     .reverse()
     .map(({ id }) => id)
     .value();

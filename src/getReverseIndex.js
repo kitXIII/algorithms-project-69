@@ -15,7 +15,7 @@ const getReverseIndex = (documents) => {
       .reduce((localAcc, term) => ({
         ...localAcc,
         [term]: [
-          ...(acc[term] || []), { id: doc.id, frequency: termsFrequencies[term] },
+          ...(acc[term] || []), { id: doc.id, frequency: termsFrequencies[term], term },
         ],
       }), {});
 
@@ -26,9 +26,9 @@ const getReverseIndex = (documents) => {
   }, {});
 
   return _.mapValues(indexWithFrequencies, (docs) => {
-    const idf = Math.log(documents.length / docs.length);
+    const idf = Math.log((documents.length + 1) / docs.length);
 
-    return docs.map((doc) => ({ id: doc.id, weight: idf * doc.frequency }));
+    return docs.map((doc) => ({ ...doc, weight: idf * doc.frequency }));
   });
 };
 
