@@ -16,10 +16,10 @@ const search = (documents, sample) => {
     .filter((v) => v)
     .flat()
     .reduce((acc, item) => {
-      const criteria = (acc[item.id] || 0) + item.criteria;
+      const criteria = acc[item.id] || 0;
       return {
         ...acc,
-        [item.id]: criteria,
+        [item.id]: criteria > item.criteria ? criteria : item.criteria,
       };
     }, {});
 
