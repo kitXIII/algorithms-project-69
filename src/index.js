@@ -21,13 +21,13 @@ const search = (documents, sample) => {
         ...acc,
         [item.id]: {
           id: item.id,
-          weight: weight + item.weight,
+          weight: item.weight > weight ? item.weight : weight,
           count: count + 1,
         },
       };
     }, {})
     .values()
-    .sortBy(['weight', 'count'])
+    .sortBy(['count', 'weight'])
     .reverse()
     .map(({ id }) => id)
     .value();
