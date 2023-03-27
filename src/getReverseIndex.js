@@ -1,6 +1,5 @@
 import _ from 'lodash';
 
-import roundByDecimal from './roundByDecimal.js';
 import stringToTerms from './stringToTerms.js';
 
 const getReverseIndex = (documents) => {
@@ -29,7 +28,7 @@ const getReverseIndex = (documents) => {
   return _.mapValues(indexWithFrequencies, (docs) => {
     const idf = Math.log(documents.length / docs.length);
 
-    return docs.map((doc) => ({ ...doc, criteria: roundByDecimal(idf * doc.frequency, 3) }));
+    return docs.map((doc) => ({ id: doc.id, weight: idf * doc.frequency }));
   });
 };
 

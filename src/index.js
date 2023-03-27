@@ -11,21 +11,26 @@ const search = (documents, sample) => {
 
   const index = getReverseIndex(documents);
 
-  const results = sampleTerms
+  return _.chain(sampleTerms)
     .map((sampleTerm) => index[sampleTerm])
     .filter((v) => v)
-    .flat()
+    .flatten()
     .reduce((acc, item) => {
-      const criteria = acc[item.id] || 0;
+      const { weight, count } = acc[item.id] || { weight: 0, count: 0 };
       return {
         ...acc,
-        [item.id]: criteria > item.criteria ? criteria : item.criteria,
+        [item.id]: {
+          id: item.id,
+          weight: weight + item.weight,
+          count: count + 1,
+        },
       };
-    }, {});
-
-  return Object.entries(results)
-    .sort((a, b) => b[1] - a[1])
-    .map(([id]) => id);
+    }, {})
+    .values()
+    .sortBy(['weight', 'count'])
+    .reverse()
+    .map(({ id }) => id)
+    .value();
 };
 
 export default search;
